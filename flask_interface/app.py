@@ -23,9 +23,10 @@ def start_session():
     data = request.json
     session_id = os.urandom(16).hex()
     
-    # Create a session with default settings
+    # Get session settings
     model_name = data.get('model_name', 'gpt-4o')
     repo_path = data.get('repo_path', '')
+    model_config = data.get('model_config', {})
     
     try:
         # Create a new aider session
@@ -36,6 +37,7 @@ def start_session():
             session_id=session_id,
             model_name=model_name,
             repo_path=repo_path,
+            model_config=model_config,
             emit_callback=emit_callback
         )
         

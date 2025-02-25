@@ -82,7 +82,7 @@ class AiderSession:
     including the model, coder, git repository, and commands.
     """
     
-    def __init__(self, session_id, model_name='gpt-4o', repo_path=None, emit_callback=None):
+    def __init__(self, session_id, model_name='gpt-4o', repo_path=None, model_config=None, emit_callback=None):
         """
         Initialize an AiderSession.
         
@@ -90,6 +90,7 @@ class AiderSession:
             session_id: Unique identifier for the session
             model_name: Name of the AI model to use
             repo_path: Path to the Git repository
+            model_config: Configuration settings for the model
             emit_callback: Callback function for emitting messages via WebSocket
         """
         self.session_id = session_id
@@ -98,7 +99,27 @@ class AiderSession:
         
         # Initialize components
         self.io = WebIO(session_id, emit_callback)
-        self.model = Model(name=model_name)
+        
+        # Create model with configuration settings
+        if model_config:
+            # Create a ModelSettings instance with the provided configuration
+            model_settings = ModelSettings(
+                name=model_name,
+                edit_format=model_config.get('edit_format', 'whole'),
+                weak_model_name=model_config.get('weak_model_name'),
+                use_repo_map=model_config.get('use_repo_map', False),
+                send_undo_reply=model_config.get('send_undo_reply', False),
+                lazy=model_config.get('lazy', False),
+                reminder=model_config.get('reminder', 'user'),
+                examples_as_sys_msg=model_config.get('examples_as_sys_msg', False),
+                use_system_prompt=model_config.get('use_system_prompt', True),
+                use_temperature=model_config.get('use_temperature', True),
+                streaming=model_config.get('streaming', True)
+            )
+            self.model = Model(settings=model_settings)
+        else:
+            # Use default model settings
+            self.model = Model(name=model_name)
         
         if repo_path and os.path.isdir(repo_path):
             self.git_repo = GitRepo(repo_path)
@@ -204,6 +225,7 @@ class AiderSession:
 
 def create_session(session_id: str, model_name: str = 'gpt-4o', 
                   repo_path: Optional[str] = None, 
+                  model_config: Optional[Dict[str, Any]] = None,
                   emit_callback=None) -> AiderSession:
     """
     Create a new aider session.
@@ -212,6 +234,7 @@ def create_session(session_id: str, model_name: str = 'gpt-4o',
         session_id: Unique identifier for the session
         model_name: Name of the AI model to use
         repo_path: Path to the Git repository
+        model_config: Configuration settings for the model
         emit_callback: Callback function for emitting messages via WebSocket
     
     Returns:
@@ -221,5 +244,6 @@ def create_session(session_id: str, model_name: str = 'gpt-4o',
         session_id=session_id,
         model_name=model_name,
         repo_path=repo_path,
+        model_config=model_config,
         emit_callback=emit_callback
     )

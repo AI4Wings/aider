@@ -41,13 +41,60 @@ function initializeSocketConnection() {
 function loadSettings() {
     const model = localStorage.getItem('aider_model');
     const apiKey = localStorage.getItem('aider_api_key');
+    const editFormat = localStorage.getItem('aider_edit_format');
+    const useRepoMap = localStorage.getItem('aider_use_repo_map');
+    const streaming = localStorage.getItem('aider_streaming');
+    const useSystemPrompt = localStorage.getItem('aider_use_system_prompt');
+    const sendUndoReply = localStorage.getItem('aider_send_undo_reply');
+    const lazy = localStorage.getItem('aider_lazy');
+    const useTemperature = localStorage.getItem('aider_use_temperature');
+    const reminder = localStorage.getItem('aider_reminder');
+    const weakModel = localStorage.getItem('aider_weak_model');
     
+    // Basic settings
     if (model) {
         document.getElementById('modelSelect').value = model;
     }
     
     if (apiKey) {
         document.getElementById('apiKeyInput').value = apiKey;
+    }
+    
+    if (editFormat) {
+        document.getElementById('editFormatSelect').value = editFormat;
+    }
+    
+    // Advanced settings
+    if (useRepoMap !== null) {
+        document.getElementById('useRepoMapSwitch').checked = useRepoMap === 'true';
+    }
+    
+    if (streaming !== null) {
+        document.getElementById('streamingSwitch').checked = streaming === 'true';
+    }
+    
+    if (useSystemPrompt !== null) {
+        document.getElementById('useSystemPromptSwitch').checked = useSystemPrompt === 'true';
+    }
+    
+    if (sendUndoReply !== null) {
+        document.getElementById('sendUndoReplySwitch').checked = sendUndoReply === 'true';
+    }
+    
+    if (lazy !== null) {
+        document.getElementById('lazySwitch').checked = lazy === 'true';
+    }
+    
+    if (useTemperature !== null) {
+        document.getElementById('useTemperatureSwitch').checked = useTemperature === 'true';
+    }
+    
+    if (reminder) {
+        document.getElementById('reminderSelect').value = reminder;
+    }
+    
+    if (weakModel) {
+        document.getElementById('weakModelSelect').value = weakModel;
     }
 }
 
@@ -85,7 +132,32 @@ function setupEventListeners() {
 // Start a new session
 function startNewSession() {
     const repoPath = document.getElementById('repoPathInput').value.trim();
+    
+    // Get model configuration settings
     const model = document.getElementById('modelSelect').value;
+    const editFormat = localStorage.getItem('aider_edit_format') || 'whole';
+    const useRepoMap = localStorage.getItem('aider_use_repo_map') === 'true';
+    const streaming = localStorage.getItem('aider_streaming') === 'true';
+    const useSystemPrompt = localStorage.getItem('aider_use_system_prompt') === 'true';
+    const sendUndoReply = localStorage.getItem('aider_send_undo_reply') === 'true';
+    const lazy = localStorage.getItem('aider_lazy') === 'true';
+    const useTemperature = localStorage.getItem('aider_use_temperature') === 'true';
+    const reminder = localStorage.getItem('aider_reminder') || 'user';
+    const weakModel = localStorage.getItem('aider_weak_model') || '';
+    
+    // Create model configuration object
+    const modelConfig = {
+        name: model,
+        edit_format: editFormat,
+        weak_model_name: weakModel || null,
+        use_repo_map: useRepoMap,
+        send_undo_reply: sendUndoReply,
+        lazy: lazy,
+        reminder: reminder,
+        use_system_prompt: useSystemPrompt,
+        use_temperature: useTemperature,
+        streaming: streaming
+    };
     
     fetch('/api/start_session', {
         method: 'POST',
@@ -94,7 +166,8 @@ function startNewSession() {
         },
         body: JSON.stringify({
             repo_path: repoPath,
-            model_name: model
+            model_name: model,
+            model_config: modelConfig
         })
     })
     .then(response => response.json())
@@ -358,11 +431,32 @@ function commitChanges() {
 
 // Save settings
 function saveSettings() {
+    // Get basic settings
     const model = document.getElementById('modelSelect').value;
     const apiKey = document.getElementById('apiKeyInput').value.trim();
+    const editFormat = document.getElementById('editFormatSelect').value;
+    
+    // Get advanced settings
+    const useRepoMap = document.getElementById('useRepoMapSwitch').checked;
+    const streaming = document.getElementById('streamingSwitch').checked;
+    const useSystemPrompt = document.getElementById('useSystemPromptSwitch').checked;
+    const sendUndoReply = document.getElementById('sendUndoReplySwitch').checked;
+    const lazy = document.getElementById('lazySwitch').checked;
+    const useTemperature = document.getElementById('useTemperatureSwitch').checked;
+    const reminder = document.getElementById('reminderSelect').value;
+    const weakModel = document.getElementById('weakModelSelect').value;
     
     // Store settings in localStorage
     localStorage.setItem('aider_model', model);
+    localStorage.setItem('aider_edit_format', editFormat);
+    localStorage.setItem('aider_use_repo_map', useRepoMap);
+    localStorage.setItem('aider_streaming', streaming);
+    localStorage.setItem('aider_use_system_prompt', useSystemPrompt);
+    localStorage.setItem('aider_send_undo_reply', sendUndoReply);
+    localStorage.setItem('aider_lazy', lazy);
+    localStorage.setItem('aider_use_temperature', useTemperature);
+    localStorage.setItem('aider_reminder', reminder);
+    localStorage.setItem('aider_weak_model', weakModel);
     
     if (apiKey) {
         localStorage.setItem('aider_api_key', apiKey);
@@ -372,7 +466,7 @@ function saveSettings() {
     const modal = bootstrap.Modal.getInstance(document.getElementById('settingsModal'));
     modal.hide();
     
-    addSystemMessage('Settings saved');
+    addSystemMessage('Model configuration saved');
 }
 
 // Add user message to chat

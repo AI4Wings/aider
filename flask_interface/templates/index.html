@@ -195,25 +195,112 @@
     
     <!-- Settings Modal -->
     <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="settingsModalLabel">Settings</h5>
+                    <h5 class="modal-title" id="settingsModalLabel">Model Configuration</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="modelSelect" class="form-label">AI Model</label>
-                        <select class="form-select" id="modelSelect">
-                            <option value="gpt-4o">GPT-4o</option>
-                            <option value="gpt-4-turbo">GPT-4 Turbo</option>
-                            <option value="claude-3-5-sonnet">Claude 3.5 Sonnet</option>
-                            <option value="claude-3-opus">Claude 3 Opus</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="apiKeyInput" class="form-label">API Key</label>
-                        <input type="password" class="form-control" id="apiKeyInput" placeholder="Enter your API key">
+                    <ul class="nav nav-tabs" id="settingsTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="basic-tab" data-bs-toggle="tab" data-bs-target="#basic" type="button" role="tab" aria-controls="basic" aria-selected="true">Basic Settings</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="advanced-tab" data-bs-toggle="tab" data-bs-target="#advanced" type="button" role="tab" aria-controls="advanced" aria-selected="false">Advanced Settings</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content pt-3" id="settingsTabContent">
+                        <!-- Basic Settings Tab -->
+                        <div class="tab-pane fade show active" id="basic" role="tabpanel" aria-labelledby="basic-tab">
+                            <div class="mb-3">
+                                <label for="modelSelect" class="form-label">AI Model</label>
+                                <select class="form-select" id="modelSelect">
+                                    <optgroup label="OpenAI Models">
+                                        <option value="gpt-4o">GPT-4o</option>
+                                        <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                                        <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                                    </optgroup>
+                                    <optgroup label="Anthropic Models">
+                                        <option value="claude-3-5-sonnet">Claude 3.5 Sonnet</option>
+                                        <option value="claude-3-opus">Claude 3 Opus</option>
+                                        <option value="claude-3-haiku">Claude 3 Haiku</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="apiKeyInput" class="form-label">API Key</label>
+                                <input type="password" class="form-control" id="apiKeyInput" placeholder="Enter your API key">
+                                <div class="form-text">Your API key is stored locally in your browser and never sent to our servers.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editFormatSelect" class="form-label">Edit Format</label>
+                                <select class="form-select" id="editFormatSelect">
+                                    <option value="whole">Whole File</option>
+                                    <option value="blocks">Edit Blocks</option>
+                                    <option value="diff">Unified Diff</option>
+                                </select>
+                                <div class="form-text">How the AI should format code changes.</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Advanced Settings Tab -->
+                        <div class="tab-pane fade" id="advanced" role="tabpanel" aria-labelledby="advanced-tab">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3 form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="useRepoMapSwitch" checked>
+                                        <label class="form-check-label" for="useRepoMapSwitch">Use Repository Map</label>
+                                        <div class="form-text">Analyze repository structure to provide better context.</div>
+                                    </div>
+                                    <div class="mb-3 form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="streamingSwitch" checked>
+                                        <label class="form-check-label" for="streamingSwitch">Enable Streaming</label>
+                                        <div class="form-text">Stream AI responses in real-time.</div>
+                                    </div>
+                                    <div class="mb-3 form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="useSystemPromptSwitch" checked>
+                                        <label class="form-check-label" for="useSystemPromptSwitch">Use System Prompt</label>
+                                        <div class="form-text">Include system prompt in AI requests.</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3 form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="sendUndoReplySwitch">
+                                        <label class="form-check-label" for="sendUndoReplySwitch">Send Undo Reply</label>
+                                        <div class="form-text">Send reply when changes are undone.</div>
+                                    </div>
+                                    <div class="mb-3 form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="lazySwitch">
+                                        <label class="form-check-label" for="lazySwitch">Lazy Mode</label>
+                                        <div class="form-text">Use lazy prompting technique.</div>
+                                    </div>
+                                    <div class="mb-3 form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="useTemperatureSwitch" checked>
+                                        <label class="form-check-label" for="useTemperatureSwitch">Use Temperature</label>
+                                        <div class="form-text">Apply temperature setting to model responses.</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="reminderSelect" class="form-label">Reminder Mode</label>
+                                <select class="form-select" id="reminderSelect">
+                                    <option value="user">User Message</option>
+                                    <option value="sys">System Message</option>
+                                    <option value="none">None</option>
+                                </select>
+                                <div class="form-text">How to remind the AI about its capabilities.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="weakModelSelect" class="form-label">Weak Model (Optional)</label>
+                                <select class="form-select" id="weakModelSelect">
+                                    <option value="">None</option>
+                                    <option value="gpt-4o-mini">GPT-4o Mini</option>
+                                    <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                                </select>
+                                <div class="form-text">Fallback model for simpler tasks.</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
